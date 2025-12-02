@@ -32,6 +32,17 @@
 \fancyhead[C]{\thepage}
 \renewcommand{\headrulewidth}{0pt}
 \setlength{\headheight}{15pt}
+% Đảm bảo số trang luôn ở giữa phía trên cho mọi phần
+\fancypagestyle{plain}{%  % plain cho các trang chapter
+  \fancyhf{}
+  \fancyhead[C]{\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+}
+
+% Định nghĩa kiểu đánh số cho phụ lục
+\newcommand{\appendixpagenumber}{%
+  \renewcommand{\thepage}{PL\arabic{page}}%
+}
 
 % ==================== CHƯƠNG & TIÊU ĐỀ ====================
 \usepackage{titlesec}
@@ -62,13 +73,13 @@
 \captionsetup[table]{
   labelfont=bf,
   labelsep=quad,
-  name=Danh mục bảng,
+  name=Bảng,
   justification=centering
 }
 \captionsetup[figure]{
   labelfont=bf,
   labelsep=quad,
-  name=Danh mục hình,
+  name=Ảnh,
   position=bottom
 }
 
@@ -94,6 +105,9 @@
 % ==================== CSQUOTES (cho biblatex, nếu cần) ====================
 \usepackage{csquotes}
 
+\renewcommand{\listtablename}{Danh mục bảng}
+\renewcommand{\listfigurename}{Danh mục ảnh}
+
 % =============================================================================
 \begin{document}
 
@@ -103,20 +117,26 @@
 
 % ==================== FRONTMATTER (số La Mã) ====================
 \frontmatter
+% Đặt lại số trang về i ngay trước mục lục
+\setcounter{page}{1}
 \pagenumbering{roman}
 
 \include{frontmatter/declaration}      % Cam kết
 \include{frontmatter/acknowledgement}  % Lời cảm ơn
 \cleardoublepage
+\setcounter{page}{1} % Đặt lại số trang về i tại đây
 \tableofcontents
 \cleardoublepage
+\renewcommand{\listtablename}{Danh mục bảng}
 \listoftables
 \cleardoublepage
+\renewcommand{\listfigurename}{Danh mục ảnh}
 \listoffigures
 
 % ==================== MAIN MATTER ====================
 \cleardoublepage
 \mainmatter
+\pagenumbering{arabic}
 
 % Chương mở đầu
 \include{chapters/introduction}
@@ -140,5 +160,12 @@
 % Tài liệu tham khảo
 \bibliographystyle{ieeetr}
 \bibliography{bib/refs}
+
+% ==================== PHỤ LỤC ====================
+\appendix
+\cleardoublepage
+\appendixpagenumber
+\include{appendices/appendixA}
+\include{appendices/appendixB}
 
 \end{document}
