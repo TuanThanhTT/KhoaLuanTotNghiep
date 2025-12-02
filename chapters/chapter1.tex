@@ -1,0 +1,136 @@
+% ==============================================================
+%  chapters/chapter1.tex
+%  Chương 1: CƠ SỞ LÝ THUYẾT VÀ TỔNG QUAN NGHIÊN CỨU
+%  ĐÃ ĐƯỢC SỬA HOÀN CHỈNH – Ảnh hiển thị 100%
+% ==============================================================
+
+\chapter{CƠ SỞ LÝ THUYẾT VÀ TỔNG QUAN NGHIÊN CỨU}
+\label{chap:cosolythuyet}
+
+Chương này trình bày cơ sở lý thuyết của các kiến trúc học sâu hiện đại được sử dụng trong bài toán phân loại ảnh, tập trung vào hai hướng tiếp cận chính: mạng nơ-ron tích chập (Convolutional Neural Networks -- CNN) và kiến trúc Transformer. Đồng thời, chương tổng quan các nghiên cứu tiêu biểu về nhận diện loài hoa, từ đó xác định khoảng trống nghiên cứu và định hướng giải quyết của đồ án.
+
+\section{Bài toán phân loại ảnh và nhận diện loài hoa}
+
+\subsection{Khái niệm}
+
+\hspace*{\parindent}Phân loại ảnh là một trong những nhiệm vụ cốt lõi của thị giác máy tính, nhằm gán nhãn lớp cho một ảnh đầu vào. Trong bài toán nhận diện loài hoa, mục tiêu là xây dựng hàm ánh xạ từ không gian ảnh $I \in \mathbb{R}^{H \times W \times 3}$ sang tập nhãn loài $\{1, 2, \dots, C\}$ với $C$ là số loài hoa:
+
+\begin{equation}
+    f: \mathbb{R}^{H \times W \times 3} \to \{1, 2, \dots, C\}
+    \label{eq:classification}
+\end{equation}
+
+\subsection{Ý nghĩa khoa học và thực tiễn}
+
+\hspace*{\parindent}Việc tự động nhận diện loài hoa có giá trị lớn trong phân loại thực vật học, giám sát đa dạng sinh học, bảo tồn nguồn gen và hỗ trợ giáo dục cộng đồng. Tại Việt Nam, đặc biệt là làng hoa Sa Đéc ứng dụng nhận diện hoa tự động sẽ góp phần quảng bá du lịch, hỗ trợ thương mại điện tử và xây dựng cơ sở dữ liệu thực vật số.
+
+Về mặt khoa học, đồ án đóng góp một bộ dữ liệu mới thu thập thực địa tại làng hoa Sa Đéc, giúp lấp đầy khoảng trống về dữ liệu hoa Việt Nam trong cộng đồng nghiên cứu học thuật quốc tế.
+
+\section{Tổng quan các nghiên cứu liên quan}
+
+\hspace*{\parindent}Các nghiên cứu nhận diện loài hoa chủ yếu được thực hiện trên hai bộ dữ liệu chuẩn Oxford-17 và Oxford-102 Flowers (102 loài, 8.189 ảnh) \cite{nilsback2008automated}. Một số công trình nghiên cứu tiêu biểu:
+
+\begin{itemize}
+    \item Mete và Ensari \cite{mete2019} đề xuất phương pháp lai giữa CNN trích xuất đặc trưng kết hợp các bộ phân loại truyền thống (SVM, KNN, Random Forest), trong đó CNN+SVM cho kết quả tốt nhất.
+    \item Alipour và cộng sự \cite{alipour2021} sử dụng transfer learning với DenseNet121, đạt 98,6\% độ chính xác trên Oxford-102 sau 50 epoch.
+    \item Gupta và cộng sự \cite{gupta2023} là một trong những nghiên cứu đầu tiên áp dụng Vision Transformer (ViT) cho bài toán phân loại hoa, chứng minh ViT vượt trội hơn CNN khi background phức tạp và dữ liệu đa dạng.
+\end{itemize}
+
+Do đó, vẫn còn thiếu các nghiên cứu đánh giá đồng thời các kiến trúc học sâu tiên tiến nhất trên dữ liệu thực tế có background phức tạp, điều kiện ánh sáng không kiểm soát -- đặc trưng của ảnh chụp ngoài thực địa tại các làng hoa Việt Nam.
+
+\section{Cơ sở lý thuyết các kiến trúc học sâu}
+\label{sec:cosolythuyet}
+
+\subsection{Mạng nơ-ron tích chập (CNN) và các biến thể}
+
+\hspace*{\parindent}Mạng CNN là kiến trúc chủ đạo trong phân loại ảnh từ năm 2012 đến nay nhờ khả năng trích xuất đặc trưng không gian phân cấp thông qua các tầng tích chập và pooling.
+
+\begin{itemize}
+    \item \textbf{ResNet50} \cite{he2016deep}: Mạng nơ-ron tích chập sâu sử dụng kết nối tắt (residual connection) để khắc phục hiện tượng vanishing gradient. Nhờ đó, các biến thể như ResNet50, ResNet101, ResNet152 có thể được huấn luyện ổn định và đạt hiệu suất vượt trội trên ImageNet.
+    \item \textbf{MobileNetV2} \cite{sandler2018mobilenetv2}: Sử dụng depthwise separable convolution và inverted residuals, giảm đáng kể số tham số, phù hợp thiết bị di động.
+    \item \textbf{EfficientNet-B2} \cite{tan2019efficientnet}: Một biến thể của dòng EfficientNet, được phát triển dựa trên nguyên tắc compound scaling đồng bộ ba yếu tố: độ sâu, độ rộng và độ phân giải đầu vào. Với chỉ 9 triệu tham số, EfficientNet-B2 vượt trội ResNet50 (25,6 triệu tham số) về độ chính xác trên ImageNet đồng thời giảm đáng kể chi phí tính toán, là lựa chọn lý tưởng trong chiến lược ensemble của đồ án.
+ \end{itemize}
+
+\begin{figure}[H]
+    \centering
+    % Cách an toàn nhất: dùng dấu nháy kép + dấu gạch chéo xuôi
+    \includegraphics[width=0.98\linewidth]{figures/chapter1/mo_hinh_cnn.jpg}
+    \caption{Kiến trúc tổng quát của mạng nơ-ron tích chập (CNN)}
+    \label{fig:cnn_arch}
+\end{figure}
+
+\subsection{Kiến trúc Transformer và Vision Transformer (ViT)}
+
+\hspace*{\parindent}Transformer được Vaswani và cộng sự đề xuất năm 2017 cho xử lý ngôn ngữ tự nhiên \cite{vaswani2017attention}, đánh dấu bước ngoặt khi thay thế hoàn toàn các tầng recurrent bằng cơ chế tự chú ý (self-attention). Năm 2020, Dosovitskiy và cộng sự mở rộng kiến trúc này sang lĩnh vực thị giác với Vision Transformer (ViT) \cite{dosovitskiy2020image}, chứng minh Transformer có thể cạnh tranh và vượt trội CNN khi được huấn luyện trên dữ liệu quy mô lớn.
+
+ViT hoạt động theo nguyên lý sau:
+
+\textbf{1. Patch Embedding:} Ảnh đầu vào $X \in \mathbb{R}^{H \times W \times C}$ được chia thành $N = \frac{HW}{P^2}$ patch có kích thước $P \times P$ (thường $P=16$). Mỗi patch $x_p \in \mathbb{R}^{P^2 \cdot C}$ được làm phẳng và chiếu tuyến tính thành vector nhúng $z_p \in \mathbb{R}^D$:
+\begin{equation}
+    z_p = x_p E, \quad E \in \mathbb{R}^{(P^2 \cdot C) \times D}
+    \label{eq:patch_embedding}
+\end{equation}
+
+\textbf{2. Class Token và Positional Embedding:} Một token học được $z_{cls} \in \mathbb{R}^D$ được thêm vào đầu chuỗi, kèm theo positional embedding $E_{pos} \in \mathbb{R}^{(N+1) \times D}$ để bảo toàn thông tin vị trí:
+\begin{equation}
+    z_0 = [z_{cls}; z_{p_1}; z_{p_2}; \dots; z_{p_N}] + E_{pos}
+    \label{eq:transformer_input}
+\end{equation}
+
+\textbf{3. Transformer Encoder:} Chuỗi $z_0$ được đưa qua $L$ tầng Transformer encoder. Mỗi tầng bao gồm Multi-Head Self-Attention (MSA) và MLP với kết nối tắt:
+\begin{align}
+    Z'_\ell &= \text{MSA}(\text{LayerNorm}(Z_{\ell-1})) + Z_{\ell-1} \label{eq:transformer_msa} \\
+    Z_\ell  &= \text{MLP}(\text{LayerNorm}(Z'_\ell)) + Z'_\ell \label{eq:transformer_mlp}
+\end{align}
+
+\textbf{4. Phân loại:} Vector $z_{cls}$ từ tầng cuối $Z_L$ được đưa qua MLP Head để dự đoán $C$ lớp:
+\begin{equation}
+    \hat{y} = \text{Softmax}(W z_L^{cls})
+    \label{eq:vit_classification}
+\end{equation}
+
+ViT chứng minh Transformer có khả năng học quan hệ toàn cục tốt hơn CNN khi được huấn luyện trên dữ liệu lớn (JFT-300M), đạt top-1 accuracy 88,55\% trên ImageNet với ViT-Huge/14 -- vượt qua mọi CNN cùng quy mô.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.98\linewidth]{figures/chapter1/mo_hinh_vit.jpg}
+    \caption{Kiến trúc tổng quát của Vision Transformer (ViT)}
+    \label{fig:vit_arch}
+\end{figure}
+
+ViT chứng minh khả năng học quan hệ toàn cục (global context) tốt hơn CNN, đặc biệt hiệu quả khi dữ liệu huấn luyện lớn và đa dạng.
+
+\subsection{YOLOv8n-cls -- Kiến trúc phân loại tốc độ cao}
+
+\hspace*{\parindent}YOLOv8n-cls là phiên bản chuyên biệt cho bài toán phân loại ảnh của dòng mô hình YOLOv8, được Ultralytics chính thức phát hành vào tháng 01/2023 \cite{ultralytics2023}. Khác với các biến thể object detection, YOLOv8n-cls được thiết kế tối giản bằng cách loại bỏ hoàn toàn các nhánh dự đoán bounding box và anchor, chỉ giữ lại đường ống trích xuất đặc trưng và đầu phân loại toàn cục.
+
+Kiến trúc của YOLOv8n-cls bao gồm các thành phần chính sau:
+\begin{itemize}
+    \item \textbf{Backbone CSPDarknet hiện đại}: Sử dụng các khối \texttt{C2f} (CSP Bottleneck với 2 phép tích chập) kết hợp hàm kích hoạt SiLU, giúp tăng cường luồng gradient và giảm đáng kể chi phí tính toán so với các backbone truyền thống.
+    \item \textbf{Neck nhẹ dựa trên PAN}: Tổng hợp đặc trưng đa tỷ lệ một cách hiệu quả để tạo biểu diễn toàn cục mạnh mẽ cho nhiệm vụ phân loại.
+    \item \textbf{Classification head}: Một tầng fully-connected kết thúc bằng hàm Softmax (hoặc sigmoid trong chế độ multi-label) để đưa ra dự đoán xác suất lớp.
+\end{itemize}
+
+Với chỉ \textbf{3,1 triệu tham số} và \textbf{8,7 GFLOPs}, YOLOv8n-cls đạt độ chính xác top-1 là 69,0\% trên ImageNet-1k (pretrained), đồng thời sở hữu tốc độ suy luận cực nhanh: khoảng 0,31 ms/ảnh trên GPU A100 (TensorRT) và dưới 13 ms trên CPU thông thường. Những ưu điểm vượt trội về tốc độ và hiệu suất tài nguyên khiến YOLOv8n-cls trở thành lựa chọn lý tưởng cho các ứng dụng thực tế yêu cầu triển khai trên thiết bị nhúng hoặc hệ thống thời gian thực -- một trong những tiêu chí quan trọng của đồ án này.
+
+\subsection{Các kỹ thuật hỗ trợ huấn luyện quan trọng}
+\label{sec:training_techniques}
+
+\hspace*{\parindent}Để đạt được hiệu suất cao trên tập dữ liệu thực địa có số lượng mẫu hạn chế và phân bố lớp không cân bằng, đồ án áp dụng đồng thời nhiều kỹ thuật huấn luyện tiên tiến đã được cộng đồng học sâu công nhận:
+
+\begin{itemize}
+    \item \textbf{Học chuyển giao (Transfer Learning)} \cite{pan2010survey, yosinski2014transferable}: 
+    Tất cả các mô hình đều được khởi tạo trọng số từ quá trình huấn luyện trước trên ImageNet-1k hoặc ImageNet-21k. Phương pháp này giúp mạng hội tụ nhanh hơn và đạt độ chính xác cao hơn đáng kể so với huấn luyện từ đầu (training from scratch), đặc biệt hiệu quả khi dữ liệu huấn luyện chỉ vài nghìn ảnh mỗi lớp.
+
+    \item \textbf{Tăng cường dữ liệu mạnh (Strong Data Augmentation)}:
+    Kết hợp nhiều phép biến đổi ngẫu nhiên đồng thời bao gồm RandomResizedCrop, RandomHorizontalFlip, ColorJitter, GaussianBlur, cùng các kỹ thuật trộn mẫu cấp cao MixUp \cite{zhang2018mixup} và CutMix \cite{yun2019cutmix}. Những phép tăng cường này làm tăng tính đa dạng của dữ liệu, giảm hiện tượng quá khớp và cải thiện khả năng khái quát hóa trên ảnh thực địa có điều kiện ánh sáng và góc chụp thay đổi lớn.
+
+    \item \textbf{Xử lý mất cân bằng lớp (Class Imbalance Handling)}:
+    Sử dụng Weighted Random Sampler trong quá trình lấy batch hoặc áp dụng Focal Loss \cite{lin2017focal} để tập trung huấn luyện nhiều hơn vào các lớp hiếm (ví dụ: một số loài hoa chỉ có dưới 200 ảnh), từ đó nâng cao độ nhạy (recall) trên toàn bộ các lớp.
+
+    \item \textbf{Tối ưu hóa và điều độ học suất hiện đại}:
+    Bộ tối ưu AdamW \cite{loshchilov2019decoupled} kết hợp lịch trình Cosine Annealing with Warm Restarts \cite{loshchilov2017sgdr} và kỹ thuật Label Smoothing \cite{szegedy2016rethinking} được sử dụng nhằm ổn định quá trình huấn luyện, tránh cực tiểu cục bộ và cải thiện độ chính xác cuối cùng từ 0,5--1,2\%.
+
+    \item \textbf{Trực quan hóa và giải thích mô hình}:
+    Grad-CAM \cite{selvaraju2017grad} được áp dụng sau huấn luyện để sinh heatmap chỉ ra vùng ảnh mà mô hình tập trung khi đưa ra dự đoán. Kỹ thuật này không chỉ giúp đánh giá tính hợp lý của mô hình mà còn là cơ sở để phát hiện các trường hợp học sai (ví dụ: mô hình chỉ nhìn vào lá thay vì hoa).
+\end{itemize}

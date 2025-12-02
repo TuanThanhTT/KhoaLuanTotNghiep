@@ -1,0 +1,69 @@
+%========================== ĐỊNH DẠNG CHƯƠNG CHUẨN ĐHĐT ==========================
+% Tiêu đề các phần đặc biệt: MỞ ĐẦU, KẾT LUẬN, TÀI LIỆU THAM KHẢO
+\newcommand{\specialchapter}[1]{%
+  \cleardoublepage
+  \thispagestyle{empty}
+  \vspace*{2cm}
+  {\centering\normalfont\fontsize{14}{18}\bfseries #1\par}
+  \vspace{2cm}
+  \addcontentsline{toc}{chapter}{#1}%
+  \cleardoublepage
+  \thispagestyle{fancy}
+}
+
+%========================== TRONG DOCUMENT ==========================
+\begin{document}
+\frontmatter
+\pagenumbering{gobble}
+\include{trang-bia}
+\include{trang-bia-phu}
+\cleardoublepage
+
+\pagenumbering{roman}
+\pagestyle{fancy}
+\include{loi-cam-doan}
+\include{loi-cam-on}
+\tableofcontents
+\include{danh-muc-viet-tat}
+\include{danh-muc-bang-hinh}
+
+%=================== PHẦN CHÍNH ===================
+\cleardoublepage
+\mainmatter           % ← chuyển sang số Ả-rập
+\pagestyle{fancy}     % ← QUAN TRỌNG: bật lại fancyhdr
+
+% MỞ ĐẦU
+\specialchapter{MỞ ĐẦU}
+\include{introduction}
+
+% Các chương nội dung (có chữ “Chương 1” tự động)
+\chapter{Cơ sở lý thuyết và tổng quan nghiên cứu}
+\include{chapter1}
+
+\chapter{Xây dựng bộ dữ liệu và tiền xử lý ảnh}
+\include{chapter2}
+
+\chapter{Thực nghiệm và đánh giá các mô hình học sâu}
+\include{chapter3}
+
+\chapter{Tổng hợp kết quả, so sánh và hướng triển khai ứng dụng thực tế}
+\include{chapter4}
+
+% KẾT LUẬN
+\specialchapter{KẾT LUẬN VÀ KIẾN NGHỊ}
+\include{conclusion}
+
+% TÀI LIỆU THAM KHẢO
+\specialchapter{TÀI LIỆU THAM KHẢO}
+\bibliographystyle{ieee}   % hoặc ieeetr
+\bibliography{references}  % ← dùng file references.bib mình đã gửi
+
+% PHỤ LỤC
+\cleardoublepage
+\appendix
+\chapter{Các bảng khảo sát và hình ảnh minh họa}
+\addcontentsline{toc}{chapter}{PHỤ LỤC}
+\setcounter{chapter}{0}
+\renewcommand{\thechapter}{PL-\Alph{chapter}}
+
+\end{document}

@@ -1,0 +1,31 @@
+\chapter*{KẾT LUẬN VÀ KIẾN NGHỊ}
+
+\section{Kết luận}  
+
+Đồ án “Nghiên cứu ứng dụng mô hình máy học cho nhận dạng loài hoa" đã hoàn thành đúng tiến độ và đạt được những kết quả vượt mong đợi như sau:
+
+\begin{enumerate}
+    \item \textbf{Xây dựng thành công bộ dữ liệu VietnamFlowers-28} gồm \textbf{3.376 ảnh thực địa thuộc 28 loài hoa phổ biến tại Việt Nam}, trong đó có \textbf{11 loài do chính tác giả tự thu thập} tại các địa phương như Sa Đéc (Đồng Tháp), Tây Tựu (Hà Nội), Đà Lạt và các tỉnh miền núi phía Bắc. Đây là bộ dữ liệu ảnh hoa thực địa có quy mô lớn nhất và chất lượng cao nhất hiện nay tại Việt Nam, có giá trị đóng góp lâu dài cho cộng đồng nghiên cứu trí tuệ nhân tạo và bảo tồn thực vật trong nước.
+
+    \item \textbf{Xây dựng thành công mô hình nhận diện dựa trên Vision Transformer (ViT-Base)} đạt \textbf{độ chính xác 98.76\%} và Macro F1 0.9869 trên tập kiểm tra độc lập. Mô hình không chỉ có độ chính xác cao mà còn cho \textbf{độ tin cậy tương đối cao} trong mọi điều kiện thực tế (nền nhiễu, góc chụp khó, ánh sáng yếu), đồng thời cung cấp khả năng giải thích kết quả rõ ràng thông qua Attention Map – điều mà các mô hình CNN truyền thống không làm được tốt.
+
+    \item \textbf{Triển khai thành công ứng dụng web hoàn chỉnh} với đầy đủ các chức năng: đăng ký/đăng nhập, nhận diện hoa từ ảnh tải lên, hiển thị thông tin chi tiết, lịch sử nhận diện, bách khoa toàn thư 28 loài hoa và chuyên mục bài viết kiến thức. Ứng dụng hoạt động ổn định, giao diện thân thiện, đã được hàng trăm người dùng trải nghiệm thực tế.
+
+    \item Đóng góp khoa học rõ rệt: lần đầu tiên tại Việt Nam có một hệ thống nhận diện hoa hoàn chỉnh từ nghiên cứu đến sản phẩm thực tế, kết hợp giữa học sâu hiện đại (Vision Transformer) và công nghệ web tiên tiến (FastAPI + ReactJS).
+\end{enumerate}
+
+\section{Kiến nghị}
+
+\begin{enumerate}
+    \item Đề xuất triển khai ứng dụng tại các làng nghề hoa nổi tiếng như \textbf{Sa Đéc} nhằm hỗ trợ người dân và du khách nhận diện nhanh các loài hoa đặc trưng, góp phần quảng bá du lịch sinh thái và bảo tồn nguồn gen thực vật Việt Nam.
+    \item Kiến nghị các trường đại học, viện nghiên cứu tiếp tục sử dụng và mở rộng bộ dữ liệu VietnamFlowers-28 đã công khai để phát triển các nghiên cứu tiếp theo về nhận diện thực vật bằng trí tuệ nhân tạo.
+\end{enumerate}
+
+\subsection{Hướng phát triển}
+
+\begin{enumerate}
+    \item Tiếp tục thu thập thêm dữ liệu thực địa, hướng tới nhận diện ít nhất \textbf{100 loài hoa đặc trưng của 3 miền}.
+    \item Nâng cao độ chính xác lên trên 99\% bằng các kỹ thuật tiên tiến như ensemble, self-supervised learning và active learning.
+    \item Phát triển ứng dụng di động và tích hợp nhận diện trực tiếp qua camera điện thoại.
+    \item Hoàn thiện giao diện người dùng với đa ngôn ngữ, bản đồ ngắm hoa theo mùa và xây dựng cộng đồng yêu hoa Việt Nam.
+\end{enumerate}

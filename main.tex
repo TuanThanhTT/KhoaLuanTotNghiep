@@ -1,0 +1,144 @@
+% =============================================================================
+% main.tex – PHIÊN BẢN CHUẨN CUỐI CÙNG (ĐÃ SỬA TẤT CẢ LỖI BẠN GẶP)
+% Biên dịch bằng: XeLaTeX → Biber → XeLaTeX → XeLaTeX
+% =============================================================================
+\documentclass[12pt,a4paper,oneside,openany]{book}
+\usepackage{csquotes}
+% ==================== FONT & TIẾNG VIỆT ====================
+\usepackage{fontspec}
+\setmainfont{Times New Roman}           % Font chuẩn trường
+
+\usepackage[vietnamese]{babel}          % Hỗ trợ tiếng Việt mới nhất (thay cho vietnam.sty)
+
+% ==================== LỀ & DÒNG ====================
+\usepackage{geometry}
+\geometry{
+  a4paper,
+  top=3cm,
+  bottom=2.5cm,
+  left=3cm,
+  right=2cm,
+  % heightrounded,                       % tránh warning "height rounded"
+}
+
+\usepackage{setspace}
+\onehalfspacing                         % chuẩn 1.5 lines (tương đương setstretch{1.32} nhưng đẹp hơn)
+\setlength{\parindent}{1.25cm}          % thụt đầu dòng đúng quy định
+
+% ==================== HEADER / FOOTER ====================
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[C]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\setlength{\headheight}{15pt}
+
+% ==================== CHƯƠNG & TIÊU ĐỀ ====================
+\usepackage{titlesec}
+\titleformat{\chapter}[display]
+  {\centering\normalfont\fontsize{14}{18}\selectfont\bfseries}
+  {CHƯƠNG \thechapter}{10pt}{\LARGE\bfseries}
+\titlespacing*{\chapter}{0pt}{30pt}{20pt}
+
+% Chương đặc biệt (MỞ ĐẦU, KẾT LUẬN, TÀI LIỆU THAM KHẢO...) không có số
+\newcommand{\specialchapter}[1]{%
+  \cleardoublepage
+  \thispagestyle{empty}
+  \vspace*{5cm}
+  {\centering\fontsize{16}{20}\selectfont\bfseries #1\par}
+  \vspace{6cm}
+  \addcontentsline{toc}{chapter}{#1}%
+  \cleardoublepage
+  \pagestyle{fancy}
+}
+
+% ==================== TOÁN HỌC & BẢNG BIỂU ====================
+\usepackage{amsmath,amssymb,amsthm}
+\numberwithin{equation}{chapter}
+\numberwithin{table}{chapter}
+\numberwithin{figure}{chapter}
+
+\usepackage{booktabs,tabularx,caption,float}
+\captionsetup[table]{
+  labelfont=bf,
+  labelsep=quad,
+  name=Danh mục bảng,
+  justification=centering
+}
+\captionsetup[figure]{
+  labelfont=bf,
+  labelsep=quad,
+  name=Danh mục hình,
+  position=bottom
+}
+
+% ==================== KHUNG BÌA (TCOLORBOX) ====================
+\usepackage{tcolorbox}
+\tcbuselibrary{skins}
+
+% ==================== HYPERREF (LUÔN ĐẶT CUỐI Preamble) ====================
+\usepackage[unicode,hidelinks]{hyperref}
+\usepackage[capitalize]{cleveref}   % để \cref{} đẹp hơn
+
+% ==================== BIBLIOGRAPHY ====================
+% Sử dụng BibTeX truyền thống, không dùng biblatex
+% \usepackage[backend=bibtex,
+%             style=ieee,
+%             sorting=nyt,
+%             isbn=false,
+%             url=true,
+%             doi=false,
+%             eprint=false]{biblatex}
+% \addbibresource{bib/refs.bib}
+
+% ==================== CSQUOTES (cho biblatex, nếu cần) ====================
+\usepackage{csquotes}
+
+% =============================================================================
+\begin{document}
+
+% ==================== TRANG BÌA CHÍNH ====================
+\include{frontmatter/cover}
+\include{frontmatter/subcover}
+
+% ==================== FRONTMATTER (số La Mã) ====================
+\frontmatter
+\pagenumbering{roman}
+
+\include{frontmatter/declaration}      % Cam kết
+\include{frontmatter/acknowledgement}  % Lời cảm ơn
+\cleardoublepage
+\tableofcontents
+\cleardoublepage
+\listoftables
+\cleardoublepage
+\listoffigures
+
+% ==================== MAIN MATTER ====================
+\cleardoublepage
+\mainmatter
+
+% Chương mở đầu
+\include{chapters/introduction}
+
+% Chương 1
+\include{chapters/chapter1}
+
+% Chương 2
+
+\include{chapters/chapter2}
+
+% Chương 3
+\include{chapters/chapter3}
+
+% Chương 4
+\include{chapters/chapter4}
+
+% Kết luận
+\include{chapters/conclusion}
+
+% Tài liệu tham khảo
+\bibliographystyle{ieeetr}
+\bibliography{bib/refs}
+
+\end{document}

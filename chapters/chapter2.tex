@@ -1,0 +1,174 @@
+\chapter{XÂY DỰNG TẬP DỮ LIỆU VÀ TIỀN XỬ LÝ ẢNH}
+\label{chap:dataset}
+
+Chương này trình bày chi tiết nguồn gốc, quy mô và đặc điểm của tập dữ liệu được sử dụng trong đồ án. Đồng thời mô tả toàn bộ quy trình tiền xử lý dữ liệu gồm làm sạch, chuẩn hóa kích thước ảnh, chia tập huấn luyện - kiểm định - kiểm tra và các kỹ thuật tăng cường dữ liệu nhằm nâng cao khả năng khái quát hóa của mô hình.
+
+\section{Nguồn gốc và quy mô tập dữ liệu}
+
+\hspace*{\parindent}Tập dữ liệu mang tên \textbf{VietnamFlowers-28} được xây dựng nhằm phục vụ nhiệm vụ nhận diện 28 loài hoa phổ biến tại Việt Nam, trong đó có 11 loài do chính tác giả tự thu thập thực địa tại làng hoa Sa Đéc tỉnh Đồng Tháp. Các loài còn lại được lấy từ tập dữ liệu công khai nổi tiếng Oxford 102 Flowers, sau đó được chọn lọc kỹ lưỡng để phù hợp với bài toán đặt ra.
+\begin{table}[htbp]
+\centering
+\caption{Thống kê tổng quan tập dữ liệu VietnamFlowers-28}
+\label{tab:dataset_summary}
+\begin{tabular}{lr}
+\toprule
+\textbf{Tiêu chí}                  & \textbf{Giá trị}                  \\
+\midrule
+Tổng số ảnh                        & 3.376                            \\
+Số loài hoa                        & 28                               \\
+Số ảnh trung bình mỗi lớp          & ~120                             \\
+Số ảnh ít nhất mỗi lớp             & 50 (Hoa cẩm chướng)              \\
+Số ảnh nhiều nhất mỗi lớp          & 234 (Dạ yến thảo)                \\
+Định dạng ảnh                      & JPEG                             \\
+Độ phân giải gốc                   & 512 × 512 đến 4032 × 3024 pixel  \\
+Điều kiện chụp                     & Ánh sáng tự nhiên, ngược sáng \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Danh sách chi tiết 28 loài và số lượng ảnh từng loài được trình bày ở Bảng \ref{tab:28species}.
+
+\subsection{Các thách thức của tập dữ liệu thực địa}
+\label{subsec:challenges}
+
+\hspace*{\parindent}So với các bộ dữ liệu chuẩn được thu thập trong môi trường kiểm soát như Oxford 102 Flower Dataset \cite{flower102}, tập dữ liệu VietnamFlowers-28 thể hiện đầy đủ những khó khăn đặc trưng của dữ liệu thực địa tại Việt Nam, cụ thể như sau:
+
+\begin{enumerate}
+    \item \textbf{Biến thiên nội lớp lớn (large intra-class variation)}:  
+    Cùng một loài hoa nhưng xuất hiện ở các giai đoạn sinh trưởng khác nhau (nụ, hé nở, nở bung), nhiều góc chụp (từ trên xuống, ngang, cận cảnh, toàn cây), và dưới các điều kiện thời tiết.
+    
+    \item \textbf{Tương đồng liên lớp cao (high inter-class similarity)}:  
+    Một số loài có ngoại hình rất gần nhau, dễ gây nhầm lẫn ngay cả với con người, ví dụ: các giống cúc vạn thọ, quỳnh anh, quỳnh anh tím, hoặc các biến thể của hoa hồng môn.
+    
+    \item \textbf{Nền cảnh phức tạp và chứa nhiều nhiễu}:  
+    Ảnh thực tế thường có nền là đất trồng, cỏ dại, lưới che nắng, chậu nhựa, bao bì, dây buộc, và đôi khi có sự xuất hiện của người hoặc vật thể khác, làm tăng độ khó trong việc trích xuất đặc trưng hoa.
+    
+    \item \textbf{Điều kiện chiếu sáng không đồng đều}:  
+    Bao gồm ánh sáng tự nhiên mạnh (ngược sáng), bóng đổ của cây và lưới che, ánh sáng đèn nhân tạo vào ban đêm, cũng như hiện tượng phản xạ trên lá ướt sau mưa.
+    
+    \item \textbf{Mất cân bằng nhẹ giữa các lớp}:  
+    Một số loài ít phổ biến chỉ có số lượng mẫu dưới 70 ảnh, trong khi loài phổ biến nhất đạt 234 ảnh, dẫn đến nguy cơ mô hình bị thiên lệch về các lớp chiếm ưu thế.
+\end{enumerate}
+
+Những thách thức nêu trên đòi hỏi phải áp dụng quy trình tiền xử lý và tăng cường dữ liệu mạnh mẽ, đồng thời lựa chọn kiến trúc mô hình có khả năng học đặc trưng bất biến và phân biệt tốt giữa các lớp tương đồng — đây cũng chính là động lực để thử nghiệm nhiều kiến trúc hiện đại trong các chương tiếp theo.
+
+\begin{table}[htbp]
+\centering
+\caption{Danh sách 28 loài hoa trong tập dữ liệu}
+\label{tab:28species}
+\small
+\begin{tabular}{l r | l r}
+\toprule
+\textbf{Tên loài}                  & \textbf{Số ảnh} & \textbf{Tên loài}                  & \textbf{Số ảnh} \\
+\midrule
+Hoa bướm hồng*                     & 147   & Hoa mõm sói                       & 78    \\
+Hoa cẩm chướng                     & 50    & Hoa mua tím*                      & 149   \\
+Hoa cẩm tú cầu*                    & 141   & Hoa ngọc lan                      & 57    \\
+Hoa cúc đồng tiền Châu Phi         & 57    & Hoa ngũ sắc Nam Phi               & 69    \\
+Hoa cúc lá nhám*                   & 145   & Hoa quỳnh anh*                    & 155   \\
+Hoa cúc vạn thọ                    & 55    & Hoa quỳnh anh tím*                & 145   \\
+Hoa cúc vạn thọ Anh                & 58    & Hoa sao nhái vàng*                & 138   \\
+Hoa dạ yến thảo                    & 234   & Hoa sen                           & 123   \\
+Hoa dâm bụt                        & 120   & Hoa sứ                            & 138   \\
+Hoa dây hồng anh*                  & 157   & Hoa súng                          & 176   \\
+Hoa đỗ quyên                       & 83    & Hoa thiên điểu*                   & 138   \\
+Hoa đồng tiền Nam Phi              & 112   & Hoa Tigôn đỏ*                     & 161   \\
+Hoa giấy*                          & 146   & Hoa hồng                          & 172   \\
+Hoa hồng môn*                      & 122   & Hoa hướng dương                   & 62    \\
+\bottomrule
+\multicolumn{4}{l}{\footnotesize{(*): 11 loài do tác giả tự thu thập thực địa tại làng hoa Sa Đéc}}
+\end{tabular}
+\end{table}
+
+\section{Quy trình tiền xử lý dữ liệu}
+
+\subsection{Làm sạch và tổ chức dữ liệu}
+
+\hspace*{\parindent}Trước khi tiến hành các bước tiền xử lý tiếp theo, toàn bộ dữ liệu thô được thực hiện quy trình làm sạch nghiêm ngặt nhằm đảm bảo chất lượng và tính nhất quán của tập dữ liệu:
+
+\begin{enumerate}
+    \item \textbf{Kiểm tra và loại bỏ các mẫu không hợp lệ}:  
+    Các ảnh bị lỗi định dạng, hỏng file, độ phân giải quá thấp hoặc bị mờ nghiêm trọng (không thể nhận diện được đối tượng chính) đã được loại bỏ hoàn toàn.
+    
+    \item \textbf{Phát hiện và loại bỏ ảnh trùng lặp}:  
+    Sử dụng thuật toán \textit{perceptual hashing} (pHash) để tính toán giá trị băm cảm nhận của từng ảnh. Các cặp ảnh có khoảng cách Hamming nhỏ hơn hoặc bằng 5 được coi là trùng lặp và chỉ giữ lại một bản đại diện.
+    
+    \item \textbf{Chuẩn hóa hệ thống đặt tên}:  
+          Toàn bộ ảnh được đổi tên theo cấu trúc  
+          \texttt{\{Mã\_loài\}\_\{STT\}.jpg}  
+          và được đặt trong thư mục tương ứng với tên loài.  
+          Ví dụ: một ảnh thuộc loài hoa quỳnh anh tím sẽ có đường dẫn  
+          \texttt{HoaQuynhAnhTim/HoaQuynhAnhTim\_0123.jpg}.  
+
+    \item \textbf{Tổ chức cấu trúc thư mục chuẩn}:  
+    Dữ liệu được sắp xếp theo cấu trúc phân tầng ba tập con độc lập:  
+    \texttt{Train}, \texttt{Valid}, và \texttt{Test}, trong đó mỗi tập chứa 28 thư mục con tương ứng với 28 loài hoa. Cấu trúc này tuân thủ chuẩn phổ biến trong các framework học sâu hiện đại (PyTorch, TensorFlow, Keras).
+\end{enumerate}
+
+Quy trình làm sạch và tổ chức nêu trên không chỉ nâng cao chất lượng dữ liệu đầu vào mà còn tạo điều kiện thuận lợi cho các bước tiền xử lý, chia tập và huấn luyện mô hình ở các giai đoạn tiếp theo.
+
+\subsection{Chuẩn hóa kích thước ảnh}
+\label{subsec:resize}
+
+\hspace*{\parindent}Để đảm bảo tính đồng nhất của dữ liệu đầu vào cho các mô hình học sâu, toàn bộ ảnh trong tập dữ liệu được chuyển đổi về kích thước cố định \textbf{224 × 224} pixel. Tuy nhiên, thay vì sử dụng phương pháp resize thông thường (có thể gây biến dạng tỷ lệ khung hình), đồ án áp dụng kỹ thuật \textbf{resize kết hợp padding} như sau:
+
+\begin{enumerate}
+    \item Ảnh gốc được thu nhỏ sao cho cạnh dài nhất đúng bằng 224 pixel, đồng thời giữ nguyên hoàn toàn tỷ lệ khung hình (aspect ratio). Quá trình thu nhỏ sử dụng bộ lọc \textbf{LANCZOS} — thuật toán nội suy chất lượng cao có trong thư viện PIL, giúp giảm thiểu hiện tượng răng cưa và mất chi tiết.
+    
+    \item Tạo một ảnh nền trắng có kích thước 224 × 224 pixel.
+    
+    \item Dán ảnh đã thu nhỏ vào chính giữa ảnh nền (center padding), nhờ đó các pixel bổ sung không làm thay đổi nội dung hoa mà chỉ đóng vai trò lấp đầy vùng trống.
+    
+    \item Toàn bộ quy trình được triển khai bằng thư viện \textbf{Pillow (PIL)} kết hợp kỹ thuật xử lý song song (\textbf{multiprocessing}) trên nền tảng Google Colab, giúp giảm đáng kể thời gian xử lý đối với hơn 3.300 ảnh.
+\end{enumerate}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.65\linewidth]{figures/chapter2/KyThuatResize.png}
+\caption{Kỹ thuật resize kết hợp padding (trái: ảnh gốc; phải: ảnh chuẩn hóa 224 × 224).}
+\label{fig:resize_padding}
+\end{figure}
+
+Phương pháp này không chỉ bảo toàn hình dáng tự nhiên của hoa mà còn giúp mô hình tập trung tốt hơn vào đối tượng chính, đồng thời tránh được hiện tượng biến dạng thường gặp khi sử dụng resize ép buộc về kích thước cố định. Kỹ thuật tương tự đã được áp dụng thành công trong nhiều nghiên cứu trước đây \cite{he2016deep,sandler2018mobilenetv2,tan2019efficientnet}.
+
+\subsection{Chia tập dữ liệu}
+\hspace*{\parindent}Sử dụng \textbf{stratified split} với tỷ lệ \textbf{70\% – 15\% – 15\%} để đảm bảo mỗi lớp có tỷ lệ ảnh giống nhau trong cả ba tập.
+
+\begin{table}[htbp]
+\centering
+\caption{Phân bố dữ liệu sau khi chia (stratified)}
+\label{tab:data_split}
+\begin{tabular}{l r r r}
+\toprule
+Tập           & Số ảnh   & Tỷ lệ   & Ảnh trung bình/lớp \\
+\midrule
+Train         & 2.363    & 70\%    & ~84                \\
+Validation    & 506      & 15\%    & ~18                \\
+Test          & 507      & 15\%    & ~18                \\
+\midrule
+Tổng cộng     & 3.376    & 100\%   & 120                \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\subsection{Tăng cường dữ liệu}
+\label{subsec:augmentation}
+
+\hspace*{\parindent}Để nâng cao khả năng khái quát hóa của mô hình và giảm nguy cơ quá khớp (overfitting) trên tập dữ liệu thực địa có số lượng mẫu hạn chế, đồ án áp dụng chiến lược tăng cường dữ liệu mạnh mẽ trong quá trình huấn luyện. Các phép biến đổi được thực hiện ngẫu nhiên trên từng batch dữ liệu (on-the-fly augmentation) bằng thư viện \textbf{Albumentations} \cite{buslaev2020albumentations} kết hợp với \textbf{PyTorch transforms} \cite{pytorch2025}, giúp tăng tính đa dạng của dữ liệu mà không cần lưu trữ thêm ảnh vật lý.
+
+Các kỹ thuật được phân loại thành hai nhóm chính:
+
+\textbf{Nhóm biến đổi hình học (geometric transformations)} nhằm mô phỏng các biến đổi không gian thường gặp trong ảnh thực địa:
+- \texttt{RandomResizedCrop} với tỷ lệ scale từ 0.7 đến 1.0 và thay đổi ngẫu nhiên tỷ lệ khung hình, giúp mô hình học bất biến với kích thước và góc nhìn khác nhau.
+- \texttt{RandomHorizontalFlip} (xác suất 0,5) và \texttt{RandomVerticalFlip} (xác suất 0,3), mô phỏng việc lật ảnh ngang/dọc để tăng tính đối xứng.
+- \texttt{RandomRotation} lên đến 90 độ và \texttt{RandomAffine} với dịch chuyển (translate 0.2), co giãn (scale 0.8--1.2), giúp mô hình xử lý tốt các ảnh chụp từ nhiều góc quay.
+
+\textbf{Nhóm biến đổi màu sắc và nhiễu (pixel-level transformations)} nhằm tái tạo các điều kiện chiếu sáng và môi trường thực tế:
+\texttt{ColorJitter} với biên độ thay đổi độ sáng, độ tương phản, độ bão hòa (±0,4) và sắc màu (±0,1), mô phỏng ánh sáng thay đổi do thời tiết hoặc thời gian trong ngày.
+\texttt{GaussianBlur} và \texttt{MotionBlur} để tạo hiệu ứng mờ do chuyển động hoặc thời tiết xấu.
+\texttt{RandomFog}, \texttt{RandomShadow}, \texttt{RandomErasing} (xác suất 0,5) để thêm sương mù, bóng đổ và che khuất ngẫu nhiên, tăng khả năng chống nhiễu cho mô hình.
+
+Ngoài ra, các kỹ thuật trộn mẫu cấp cao như \texttt{CutMix} (\(\alpha = 1.0\)) \cite{yun2019cutmix} và \texttt{MixUp} (\(\alpha = 0.2\)) \cite{zhang2018mixup} được áp dụng để tạo ra các mẫu mới bằng cách kết hợp tuyến tính hoặc cắt dán giữa hai ảnh, đồng thời trộn nhãn tương ứng. Những phương pháp này không chỉ tăng số lượng dữ liệu hiệu quả mà còn giúp mô hình học được các đặc trưng phân biệt tốt hơn giữa các lớp tương đồng.
+
+Chiến lược tăng cường dữ liệu nêu trên đã được chứng minh mang lại cải thiện đáng kể về độ chính xác và độ bền vững trên nhiều tập dữ liệu thực tế \cite{shorten2019survey}.

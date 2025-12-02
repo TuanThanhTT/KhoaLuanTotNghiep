@@ -1,0 +1,46 @@
+\chapter*{PHẦN MỞ ĐẦU}
+\addcontentsline{toc}{chapter}{PHẦN MỞ ĐẦU}
+
+\hspace*{\parindent}Trong bối cảnh trí tuệ nhân tạo và học sâu đang phát triển mạnh mẽ, bài toán phân loại ảnh thực vật nói chung và nhận diện loài hoa nói riêng đã và đang thu hút sự quan tâm lớn từ cộng đồng nghiên cứu nhờ tính ứng dụng cao trong bảo tồn đa dạng sinh học, du lịch sinh thái, giáo dục và thương mại điện tử. Tại Việt Nam, làng hoa Sa Đéc (tỉnh Đồng Tháp) là trung tâm sản xuất hoa kiểng lớn nhất khu vực Đồng bằng sông Cửu Long với diện tích hơn 950 ha, hơn 4.000 hộ trồng hoa, cung ứng trên 12 triệu sản phẩm mỗi năm và tạo ra giá trị kinh tế gần 3.349 tỷ đồng (năm 2022). Tuy nhiên, việc nhận diện và quản lý các loài hoa hiện nay vẫn chủ yếu dựa vào kinh nghiệm thủ công, chưa có hệ thống tự động hóa đáng kể.
+
+Các bộ dữ liệu hoa phổ biến trên thế giới như Oxford-17 Flowers, Oxford-102 Flowers hay Flower-102 đều được thu thập trong điều kiện phòng thí nghiệm hoặc môi trường nước ngoài, không phản ánh đúng đặc điểm hình thái, màu sắc và điều kiện chụp thực tế của các loài hoa Việt Nam, đặc biệt là các giống hoa đặc trưng tại làng hoa Sa Đéc. Cho đến nay, tại Việt Nam vẫn chưa có bộ dữ liệu ảnh hoa công khai, chất lượng cao và được đánh giá toàn diện bởi các mô hình học sâu hiện đại.
+
+Xuất phát từ thực trạng trên, đồ án tập trung xây dựng bộ dữ liệu ảnh hoa Việt Nam đầu tiên có tính đại diện cao, đồng thời khảo sát hiệu quả của các kiến trúc học sâu tiên tiến nhằm tìm ra giải pháp nhận diện chính xác, nhanh và khả thi cho triển khai thực tế tại địa phương.
+
+Mục đích nghiên cứu: Xây dựng bộ dữ liệu ảnh gồm 28 loài hoa đặc trưng Việt Nam (trong đó có 11 loài tự thu thập thực địa tại làng hoa Sa Đéc), đồng thời đánh giá toàn diện năm kiến trúc học sâu hiện đại nhất năm 2025 nhằm lựa chọn mô hình tối ưu về độ chính xác, tốc độ suy luận và khả năng triển khai trên thiết bị di động và nhúng.
+
+Nhiệm vụ nghiên cứu:
+\begin{itemize}
+\item Thu thập, làm sạch và xây dựng bộ dữ liệu ảnh hoa gồm 3.376 ảnh thuộc 28 loài, trong đó 11 loài được chụp thực địa tại làng hoa Sa Đéc.
+\item Thực hiện các kỹ thuật tiền xử lý và tăng cường dữ liệu phù hợp với đặc điểm ảnh thực tế.
+\item Huấn luyện và tinh chỉnh năm mô hình học sâu: YOLOv8n-cls, Vision Transformer (ViT-Base), ResNet50, EfficientNet-B2 Ensemble và MobileNetV2.
+\item Đánh giá hiệu suất mô hình theo các chỉ số Accuracy, Macro F1, tốc độ suy luận, kích thước mô hình và khả năng giải thích bằng Grad-CAM.
+\item So sánh, phân tích và đề xuất mô hình tối ưu nhất cho ứng dụng thực tế.
+\end{itemize}
+
+Đối tượng và phạm vi nghiên cứu:
+\begin{itemize}
+\item Đối tượng nghiên cứu: 28 loài hoa phổ biến tại Việt Nam, bao gồm 11 loài tự thu thập thực địa tại làng hoa Sa Đéc (Hoa giấy, Cúc lá nhám, Hoa bướm hồng, Hoa quỳnh anh, Hoa quỳnh anh tím, Hoa tigôn đỏ, Hoa thiên điểu, Hoa mua tím, Hoa sao nhái vàng, Dây hồng anh, Cẩm tú cầu) và 17 loài còn lại từ nguồn công cộng đã được kiểm chứng chất lượng.
+\item Phạm vi nghiên cứu: Ảnh tĩnh chụp trong điều kiện ánh sáng tự nhiên, kích thước chuẩn hóa 224×224 pixel, không bao gồm ảnh chụp đêm, ảnh hồng ngoại hoặc video.
+\end{itemize}
+
+Phương pháp nghiên cứu:
+\begin{itemize}
+\item Phương pháp lý thuyết: Tổng quan các công trình nghiên cứu liên quan và cơ sở lý thuyết của các kiến trúc CNN, Transformer và YOLO-cls.
+\item Phương pháp thực nghiệm: Sử dụng Python, PyTorch 2.6 và Ultralytics YOLOv8; huấn luyện trên cụm GPU Tesla T4 (Kaggle); áp dụng transfer learning, các kỹ thuật augmentation nâng cao (MixUp, CutMix, RandomErasing, GaussianBlur), label smoothing, focal loss, ensemble và Grad-CAM.
+\item Phương pháp phân tích: Đánh giá đồng thời năm mô hình trên cùng bộ dữ liệu, cùng seed ngẫu nhiên và cùng điều kiện phần cứng nhằm đảm bảo tính công bằng và khả năng tái lập.
+\end{itemize}
+
+Những đóng góp chính của đồ án:
+\begin{itemize}
+\item Xây dựng và công bố bộ dữ liệu ảnh hoa Việt Nam đầu tiên gồm 28 loài với 3.376 ảnh chất lượng cao, trong đó 11 loài được thu thập thực địa tại làng hoa Sa Đéc, nguồn tài nguyên mở phục vụ cộng đồng nghiên cứu.
+\item Đánh giá toàn diện năm kiến trúc học sâu hiện đại năm 2025, đạt kết quả cao: mô hình Vision Transformer (ViT-Base) được đề xuất là giải pháp tối ưu nhất nhờ độ chính xác 98,76 \%, khả năng giải thích vượt trội qua cơ chế attention và Grad-CAM.
+\end{itemize}
+
+Cấu trúc của đồ án: Ngoài phần Mở đầu, Kết luận và kiến nghị, Tài liệu tham khảo, Phụ lục, đồ án gồm bốn chương chính:
+\begin{itemize}
+\item Chương 1. Cơ sở lý thuyết và tổng quan nghiên cứu
+\item Chương 2. Xây dựng tập dữ liệu và tiền xử lý ảnh
+\item Chương 3. Thực nghiệm và đánh giá hiệu suất các mô hình
+\item Chương 4. Triễn khai hệ thống và xây dựng ứng dụng
+\end{itemize}

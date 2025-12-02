@@ -1,0 +1,376 @@
+\chapter{TRIỂN KHAI HỆ THỐNG VÀ XÂY DỰNG ỨNG DỤNG}
+\label{chap:deployment}
+
+Dựa trên kết quả thực nghiệm và đánh giá ở Chương 3, chương này tổng hợp, so sánh và đề xuất mô hình tối ưu cho việc triển khai ứng dụng thực tiễn. Nội dung trọng tâm bao gồm phân tích thiết kế Cơ sở dữ liệu, quy trình xây dựng WebAPI (Backend) với FastAPI và phát triển giao diện người dùng (Frontend) với ReactJS.
+
+\section{Tổng hợp kết quả và đề xuất mô hình triển khai}
+
+\subsection{Tổng hợp kết quả định lượng}
+Bảng \ref{tab:summary_chap4} tổng kết hiệu suất của năm mô hình học sâu, là cơ sở cho việc lựa chọn mô hình triển khai.
+
+\begin{table}[h]
+\centering
+\caption{Tổng kết hiệu suất 5 mô hình trên tập Test (323 ảnh)}
+\label{tab:summary_chap4}
+\begin{tabular}{|l|c|c|c|c|c|c|}
+\hline
+\textbf{Mô hình} & \textbf{Test Acc} & \textbf{Macro F1} & \textbf{Params} & \textbf{Speed ($\sim$ms/ảnh)} & \textbf{Best Epoch} \\
+\hline
+YOLOv8n-cls & 99.07\% & 0.99 & 1.47M & 7.6 & 44 \\
+\textbf{ViT-Base} & \textbf{98.76\%} & \textbf{0.9869} & 85.8M & 18 & 8 \\
+EfficientNet-B2 & 98.45\% & 0.98 & 9.1M & 25 & 28  \\
+ResNet50 & 98.14\% & 0.9814 & 23.6M & 12 & 55 \\
+MobileNetV2 & 93.50\% & 0.9152 & 3.5M & 9 & 45 \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Lựa chọn Mô hình ViT-Base}
+Mặc dù YOLOv8n-cls có tốc độ nhanh nhất, \textbf{ViT-Base} được chọn làm mô hình triển khai cốt lõi. Lý do chính là \textbf{ViT-Base} đạt độ chính xác rất cao (98.76\%) và cung cấp khả năng giải thích mô hình (nhờ cơ chế Attention Map) vượt trội hơn so với các mô hình CNN truyền thống, đảm bảo tính tin cậy của kết quả dự đoán trong ứng dụng. YOLOv8n-cls được coi là lựa chọn thứ cấp cho các ứng dụng Edge Computing trong tương lai.
+
+
+
+\section{Thiết kế và phân tích cơ sở dữ liệu}
+Hệ thống sử dụng cơ sở dữ liệu (CSDL) PostgreSQL để quản lý thông tin tĩnh (dữ liệu các loài hoa) và thông tin động (người dùng, lịch sử nhận diện).
+
+\subsection{Phân tích Thiết kế Cơ sở Dữ liệu}
+CSDL được thiết kế dựa trên các thực thể chính sau, phục vụ trực tiếp cho chức năng nhận diện, quản lý người dùng và lưu trữ thông tin:
+
+\subsubsection{Bảng \texttt{flowers} (Quản lý Thông tin 28 Loài hoa)}
+Bảng này lưu trữ toàn bộ dữ liệu tĩnh của 28 loài hoa được mô hình ViT-Base nhận diện.
+
+\begin{table}[h]
+\centering
+\caption{Cấu trúc bảng \texttt{flowers}}
+\begin{tabular}{|p{5cm}|p{3.5cm}|p{8cm}|}
+\hline
+\textbf{Trường} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
+\hline
+\texttt{id} & \texttt{SERIAL PRIMARY KEY} & Khóa chính (Primary Key). \\
+\hline
+\texttt{code} & \texttt{VARCHAR(255) UNIQUE} & Mã hoa không dấu (ví dụ: HoaSung), dùng để khớp với kết quả trả về từ mô hình ViT. \\
+\hline
+\texttt{scientific\_name} & \texttt{VARCHAR(255) NOT NULL} & Tên khoa học của loài hoa. \\
+\hline
+\texttt{vietnamese\_name} & \texttt{VARCHAR(255) NOT NULL} & Tên tiếng Việt của loài hoa. \\
+\hline
+\texttt{description} & \texttt{TEXT} & Mô tả chung về loài hoa. \\
+\hline
+\texttt{recognition\_features} & \texttt{TEXT} & Đặc điểm nhận dạng nổi bật. \\
+\hline
+\texttt{meaning} & \texttt{TEXT} & Ý nghĩa biểu tượng của loài hoa. \\
+\hline
+\texttt{environment} & \texttt{TEXT} & Yêu cầu môi trường sống, trồng trọt. \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{Bảng \texttt{users} (Quản lý Người dùng)}
+Bảng này quản lý thông tin tài khoản người dùng và quyền truy cập vào hệ thống.
+
+\begin{table}[h]
+\centering
+\caption{Cấu trúc bảng \texttt{users}}
+\begin{tabular}{|p{3.5cm}|p{5cm}|p{8cm}|}
+\hline
+\textbf{Trường} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
+\hline
+\texttt{id} & \texttt{SERIAL PRIMARY KEY} & Khóa chính. \\
+\hline
+\texttt{username} & \texttt{VARCHAR(255) UNIQUE} & Tên đăng nhập. \\
+\hline
+\texttt{password\_hash} & \texttt{VARCHAR(255) NOT NULL} & Mã băm (hash) mật khẩu đã mã hóa. \\
+\hline
+\texttt{email} & \texttt{VARCHAR(255) UNIQUE} & Địa chỉ email duy nhất. \\
+\hline
+\texttt{role} & \texttt{VARCHAR(50) DEFAULT 'user'} & Vai trò người dùng (user hoặc admin). \\
+\hline
+\texttt{is\_google} & \texttt{BOOLEAN DEFAULT FALSE} & Cờ xác định đăng nhập bằng Google. \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{Bảng \texttt{detection\_history} (Lịch sử Nhận diện)}
+Bảng này ghi lại chi tiết các lần người dùng thực hiện nhận diện, tạo nền tảng cho việc phân tích hiệu quả sử dụng.
+
+\begin{table}[h]
+\centering
+\caption{Cấu trúc bảng \texttt{detection\_history}}
+\begin{tabular}{|p{3.5cm}|p{3.5cm}|p{8cm}|}
+\hline
+\textbf{Trường} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
+\hline
+\texttt{id} & \texttt{SERIAL PRIMARY KEY} & Khóa chính. \\
+\hline
+\texttt{user\_id} & \texttt{INT REFERENCES users} & Khóa ngoại đến bảng \texttt{users} (người thực hiện nhận diện). \\
+\hline
+\texttt{flower\_id} & \texttt{INT REFERENCES flowers} & Khóa ngoại đến bảng \texttt{flowers} (kết quả nhận diện). \\
+\hline
+\texttt{flower\_code} & \texttt{VARCHAR(255)} & Mã hoa không dấu do model trả về. \\
+\hline
+\texttt{accuracy} & \texttt{NUMERIC(5,4)} & Độ chính xác (confidence score) của dự đoán (0.0000 - 1.0000). \\
+\hline
+\texttt{detected\_at} & \texttt{TIMESTAMP} & Thời điểm nhận diện. \\
+\hline
+\texttt{image\_origin} & \texttt{TEXT} & Đường dẫn hoặc dữ liệu ảnh gốc (lưu trữ phục vụ truy xuất). \\
+\hline
+\texttt{image\_gradcam} & \texttt{TEXT} & Đường dẫn hoặc dữ liệu ảnh Grad-CAM (dùng cho tính năng giải thích). \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{Các thực thể phụ}
+Bên cạnh các bảng chính, CSDL còn bao gồm các bảng phụ trợ khác:
+\begin{itemize}
+    \item \textbf{\texttt{verification\_codes}:} Lưu trữ mã xác minh dùng trong quá trình đăng ký hoặc đặt lại mật khẩu bằng email.
+    \item \textbf{\texttt{flower\_images}:} Lưu trữ các đường dẫn/dữ liệu ảnh tham chiếu của từng loài hoa.
+    \item \textbf{\texttt{articles}:} Lưu trữ các bài viết, tin tức hoặc thông tin bổ sung liên quan đến hoa, có thể được quản lý và hiển thị trên giao diện người dùng.
+\end{itemize}
+\subsection{Mối quan hệ Dữ liệu}
+
+Mối quan hệ giữa các thực thể trong CSDL tuân theo mô hình liên kết một-nhiều (One-to-Many), trong đó thực thể trung tâm quản lý dữ liệu động là \textbf{\texttt{detection\_history}}.
+
+Thực thể \texttt{detection\_history} thiết lập hai mối quan hệ \textbf{Khóa ngoại} (\textit{FOREIGN KEY}) chính với các bảng \texttt{users} và \texttt{flowers}:
+
+\begin{enumerate}
+    \item \textbf{Mối quan hệ với Bảng \texttt{users} (Người dùng):}
+    \begin{itemize}
+        \item \textbf{Khóa ngoại:} \texttt{user\_id} (trong bảng \texttt{detection\_history}).
+        \item \textbf{Mối quan hệ:} Một-nhiều (1:N).
+        \item \textbf{Mô tả:} Một người dùng (từ bảng \texttt{users}) có thể thực hiện \textbf{nhiều lần} nhận diện. Mối quan hệ này cho phép truy vết lịch sử nhận diện của từng tài khoản.
+    \end{itemize}
+
+    \item \textbf{Mối quan hệ với Bảng \texttt{flowers} (Loài hoa):}
+    \begin{itemize}
+        \item \textbf{Khóa ngoại:} \texttt{flower\_id} (trong bảng \texttt{detection\_history}).
+        \item \textbf{Mối quan hệ:} Một-nhiều (1:N).
+        \item \textbf{Mô tả:} Một loài hoa (từ bảng \texttt{flowers}) có thể là kết quả dự đoán của \textbf{nhiều lần} nhận diện khác nhau. Mối quan hệ này giúp truy xuất thông tin chi tiết của loài hoa sau khi mô hình trả về kết quả.
+    \end{itemize}
+\end{enumerate}
+
+Mối quan hệ này đảm bảo tính toàn vẹn của dữ liệu: mọi kết quả nhận diện đều phải liên kết với một người dùng và một loài hoa đã được định nghĩa trong CSDL.
+
+% Đề xuất chèn Sơ đồ ERD
+\par Để minh họa trực quan các mối quan hệ trên, nên bổ sung Sơ đồ Thực thể-Liên kết (ERD) như sau:
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/chapter4/ERD.jpg} % Thay thế bằng đường dẫn Sơ đồ ERD thực tế
+    \caption{Sơ đồ Thực thể-Liên kết (ERD) mô tả mối quan hệ Khóa ngoại chính giữa các bảng.}
+    \label{fig:erd_diagram}
+\end{figure}
+
+\section{Xây dựng Backend với FastAPI}
+
+Backend đóng vai trò là cầu nối giữa Frontend và mô hình học sâu, được phát triển trên nền tảng Python với framework FastAPI – một trong những framework hiện đại và hiệu năng cao nhất hiện nay.
+
+\begin{table}[htbp]
+\centering
+\caption{Thông tin chung về Backend FastAPI}
+\small
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{>{\bfseries}l p{10.5cm}}
+\toprule
+Thông tin & Chi tiết \\
+\midrule
+Framework & FastAPI (phiên bản 0.115.0) \\
+Ngôn ngữ lập trình & Python 3.11 \\
+Thư viện học sâu & PyTorch 2.4.1 + torchvision + timm 1.0.9 \\
+Mô hình triển khai & ViT-Base/Patch16-224 (\texttt{best\_vit\_v13.pth}) \\
+Cơ sở dữ liệu & PostgreSQL \\
+Quản lý dependency & Poetry \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+ \begin{figure}[htbp]
+   \centering
+   \includegraphics[width=0.9\linewidth]{figures/chapter4/swagger.jpg}
+   \caption{Swagger UI với PastAPI.}
+   \label{fig:swagger_ui}
+   \end{figure}
+
+\subsection{Quy trình xử lý yêu cầu nhận diện loài hoa}
+
+Quy trình được thực hiện tuần tự và tối ưu để giảm thiểu độ trễ như sau:
+
+\begin{enumerate}
+    \item Khi server khởi động, mô hình ViT-Base được tải một lần duy nhất vào GPU để tránh tải lại mỗi request.
+    \item Client gửi ảnh (dạng \texttt{multipart/form-data}) qua endpoint \texttt{POST /api/v1/identify\_flower}.
+    \item Ảnh được tiền xử lý đúng theo pipeline huấn luyện:
+    \begin{itemize}
+        \item Resize về 224×224
+        \item Chuẩn hóa với mean = [0.6293, 0.5822, 0.5137] và std = [0.3281, 0.3258, 0.3696]
+        \item Chuyển thành tensor và đưa lên GPU
+    \end{itemize}
+    \item Mô hình ViT-Base thực hiện suy luận → trả về mã loài hoa (ví dụ: \texttt{HoaSen}) và độ tin cậy (confidence score).
+    \item Backend truy vấn bảng \texttt{flowers} trong CSDL bằng mã hoa để lấy toàn bộ thông tin chi tiết.
+    \item Kết quả được lưu vào bảng \texttt{detection\_history} (gồm user\_id, flower\_id, accuracy, timestamp, đường dẫn ảnh gốc).
+    \item Trả về dữ liệu JSON đầy đủ cho Frontend bao gồm:
+    \begin{itemize}
+        \item Tên tiếng Việt và tên khoa học
+        \item Độ chính xác dự đoán
+        \item Mô tả, ý nghĩa, đặc điểm nhận dạng
+        \item Đường dẫn ảnh Attention Map (nếu bật chế độ giải thích)
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Ưu điểm nổi bật của FastAPI trong dự án}
+
+\begin{table}[htbp]
+\centering
+\caption{Lý do lựa chọn FastAPI}
+\small
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{>{\bfseries}l p{10.5cm}}
+\toprule
+Tiêu chí & Lợi ích thực tế đạt được \\
+\midrule
+Hiệu năng cao & Tốc độ xử lý request ngang ngửa Node.js/Go nhờ async \\
+Tự động sinh tài liệu & Swagger UI giúp tester và hội đồng dễ dàng kiểm tra API \\
+Validation tự động & Pydantic kiểm tra kiểu dữ liệu → giảm lỗi runtime \\
+Dễ tích hợp PyTorch & Hỗ trợ async inference, không block event loop \\
+Triển khai đơn giản & Chỉ cần 1 file \texttt{Dockerfile} là có thể deploy \\
+Bảo mật & Hỗ trợ OAuth2, JWT, dependency injection nguyên bản \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Nhờ sử dụng FastAPI, toàn bộ hệ thống backend chỉ gồm chưa tới 600 dòng code nhưng vẫn đảm bảo hiệu năng cao, dễ bảo trì và có tài liệu API hoàn chỉnh – phù hợp tiêu chuẩn của một sản phẩm thực tế.
+
+\section{Xây dựng Frontend với ReactJS}
+
+Frontend được phát triển bằng ReactJS – thư viện JavaScript phổ biến nhất hiện nay, nhằm cung cấp giao diện người dùng hiện đại, thân thiện và tương thích hoàn hảo trên cả máy tính và điện thoại.
+
+\begin{table}[htbp]
+\centering
+\caption{Thông tin chung về Frontend}
+\small
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{>{\bfseries}l p{10.5cm}}
+\toprule
+Thông tin & Chi tiết \\
+\midrule
+Thư viện chính & ReactJS + Vite \\
+Ngôn ngữ & TypeScript\\
+UI Framework & TailwindCSS \\
+Quản lý trạng thái & React Query + Zustand \\
+Gọi API & Axios + React Query \\
+Routing & React Router DOM \\
+Upload file & react-dropzone + preview ảnh \\
+
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Các giao diện chính của ứng dụng}   
+\subsection{Trang chủ}   
+
+Trang chủ cung cấp cái nhìn tổng quan về ứng dụng nhận diện loài hoa, với các liên kết nhanh đến các chức năng chính như đăng ký, đăng nhập và nhận diện hoa.   
+
+ \begin{figure}[htbp]
+   \centering
+   \includegraphics[width=0.9\linewidth]{figures/chapter4/trangchu.jpg}
+   \caption{Trang chủ website.}
+   \label{fig:home}
+   \end{figure}
+
+
+\subsection{Giới thiệu} 
+
+Tại trang này, người dùng có thể tìm hiểu về mục tiêu, tính năng nổi bật và hướng phát triển của ứng dụng nhận diện loài hoa sử dụng mô hình ViT-Base.
+
+ \begin{figure}[htbp]
+   \centering
+   \includegraphics[width=0.9\linewidth]{figures/chapter4/gioithieu.jpg}
+   \caption{Trang giới thiệu.}
+   \label{fig:gioithieu}
+   \end{figure}
+
+\subsection{Đăng ký} 
+
+Tại giao diện nay, người dùng có thể tạo tài khoản mới bằng cách nhập các thông tin cần thiết như tên đăng nhập, email và mật khẩu. Hệ thống sẽ gửi mã xác minh đến email để hoàn tất quá trình đăng ký.
+
+ \begin{figure}[htbp]
+   \centering
+   \includegraphics[width=0.9\linewidth]{figures/chapter4/dangky.jpg}
+   \caption{Trang đăng ký tài khoản.}
+   \label{fig:dangky}
+   \end{figure}
+
+\subsection{Đăng nhập}
+Trang đăng nhập cho phép người dùng truy cập vào hệ thống bằng tên đăng nhập và mật khẩu đã đăng ký. Ngoài ra, người dùng cũng có thể đăng nhập nhanh thông qua tài khoản Google.
+ \begin{figure}[htbp]
+   \centering
+   \includegraphics[width=0.9\linewidth]{figures/chapter4/dangnhap.jpg}
+   \caption{Trang đăng nhập.}
+   \label{fig:login}
+   \end{figure}
+
+\subsection{Nhận diện hoa}  
+Tại đây, người dùng có thể tải lên ảnh hoa từ thiết bị của mình để hệ thống nhận diện loài hoa. Kết quả nhận diện sẽ hiển thị tên loài hoa, độ chính xác và các thông tin chi tiết liên quan.   
+ \begin{figure}[htbp]
+   \centering
+   \includegraphics[width=0.9\linewidth]{figures/chapter4/nhandang.jpg}
+   \caption{Giao diện nhận diện ảnh hoa.}
+   \label{fig:nhandienhoa}
+   \end{figure}
+\subsection{Lịch sử nhận diện}   
+Trang này hiển thị danh sách các lần nhận diện hoa đã thực hiện bởi người dùng, bao gồm thông tin về loài hoa, độ chính xác và thời gian nhận diện. Người dùng có thể xem lại kết quả và ảnh đã tải lên trước đó.
+ \begin{figure}[htbp]
+   \centering
+   \includegraphics[width=0.9\linewidth]{figures/chapter4/lichsu.jpg}
+   \caption{Giao diện xem lịch sử nhận diện.}
+   \label{fig:lichsu}
+   \end{figure}
+ 
+ \begin{figure}[htbp]
+   \centering
+   \includegraphics[width=0.9\linewidth]{figures/chapter4/chitietlichsu.jpg}
+   \caption{Giao diện xem chi tiết lịch sử nhận diện.}
+   \label{fig:lichsu_chitiet}
+   \end{figure}
+\subsection{Bài viết về hoa}
+Trang bài viết cung cấp các thông tin bổ ích về các loài hoa, bao gồm cách trồng, chăm sóc và ý nghĩa văn hóa. Người dùng có thể đọc và tìm hiểu thêm về thế giới hoa phong phú.
+ \begin{figure}[htbp]
+   \centering
+   \includegraphics[width=0.9\linewidth]{figures/chapter4/baiviet.jpg}
+   \caption{Giao diện xem bài viết về hoa.}
+   \label{fig:baiviet}
+   \end{figure}
+
+\section{Hướng phát triển tương lai}
+
+Dù hệ thống hiện tại đã đạt hiệu suất cao và hoạt động ổn định trong thực tế, vẫn còn nhiều hướng phát triển để nâng cấp ứng dụng thành một công cụ hoàn thiện hơn, có giá trị khoa học và ứng dụng cao hơn trong tương lai. Các hướng chính bao gồm như sau:
+
+\subsubsection{Bổ sung và hoàn thiện tập dữ liệu}
+
+\begin{itemize}
+    \item \textbf{Mở rộng số lượng loài hoa:} Hiện tại hệ thống nhận diện 28 loài hoa phổ biến. Trong giai đoạn tiếp theo, tập dữ liệu sẽ được mở rộng lên ít nhất \textbf{100 loài hoa đặc trưng của Việt Nam} (bao gồm cả các loài hoa dại, hoa miền núi, hoa quý hiếm như Lan Hài, Trầm Tím, Sen Vàng Hà Giang, v.v.).
+    \item \textbf{Tăng số lượng ảnh mỗi lớp:} Đặc biệt chú trọng bổ sung ảnh cho 8 lớp hiện đang ít dữ liệu (<60 ảnh/lớp) nhằm giảm thiểu hiện tượng thiên lệch mô hình.
+    \item \textbf{Thu thập ảnh thực địa đa dạng hơn:} Tập trung vào các điều kiện khó như hoa bị che khuất một phần, chụp ngược sáng, chụp xa, ảnh chụp bằng điện thoại chất lượng thấp, ảnh có nhiều hoa cùng loại – nhằm tăng tính khái quát hóa (generalization) của mô hình.
+    \item \textbf{Xây dựng cơ chế cộng đồng đóng góp ảnh (crowdsourcing):} Cho phép người dùng tải lên ảnh hoa kèm nhãn (sau khi được admin duyệt) để liên tục làm giàu tập dữ liệu theo phương pháp \textit{active learning}.
+\end{itemize}
+
+\subsubsection{Nâng cao độ chính xác và khả năng giải thích của mô hình}
+
+\begin{itemize}
+    \item \textbf{Huấn luyện lại với tập dữ liệu lớn hơn và các kỹ thuật tiên tiến:} Áp dụng Self-Supervised Learning (DINOv2, MAE), Knowledge Distillation từ mô hình lớn (ViT-Large, Swin-Transformer) về mô hình nhẹ để tăng độ chính xác mà vẫn giữ tốc độ.
+    \item \textbf{Kết hợp nhiều mô hình (Ensemble):} Sử dụng kỹ thuật ensemble giữa ViT-Base và YOLOv8n-cls để lấy kết quả cuối cùng, giúp giảm thiểu sai sót trong các trường hợp khó.
+    \item \textbf{Tích hợp cơ chế giải thích nâng cao:} Ngoài Attention Map, sẽ bổ sung Grad-CAM++, SHAP values hoặc LIME để người dùng hiểu rõ hơn vì sao mô hình đưa ra dự đoán đó.
+    \item \textbf{Xây dựng phiên bản nhẹ cho di động:} Huấn luyện YOLOv8n-cls hoặc MobileViT lên tập dữ liệu mới để triển khai nhận diện real-time trên điện thoại mà không cần kết nối internet.
+\end{itemize}
+
+\subsubsection{Hoàn thiện giao diện và trải nghiệm người dùng}
+
+\begin{itemize}
+    \item \textbf{Phát triển ứng dụng di động (Mobile App):} Sử dụng React Native hoặc Flutter để xây dựng ứng dụng trên iOS và Android, tích hợp camera trực tiếp, nhận diện real-time, lưu lịch sử offline.
+    \item \textbf{Tích hợp nhận diện bằng camera trên web:} Sử dụng WebRTC + MediaStream API để người dùng có thể quét hoa trực tiếp từ máy tính/điện thoại mà không cần tải ảnh.
+    \item \textbf{Nâng cấp giao diện người dùng:} 
+    \begin{itemize}
+        \item Thêm chế độ tối (dark mode) hoàn chỉnh
+        \item Hỗ trợ đa ngôn ngữ (tiếng Việt – tiếng Anh)
+        \item Tích hợp bản đồ các địa điểm ngắm hoa theo mùa tại Việt Nam
+        \item Thêm tính năng gợi ý loài hoa tương tự khi nhận diện sai hoặc không chắc chắn
+    \end{itemize}
+    \item \textbf{Xây dựng cộng đồng người dùng:} Cho phép bình luận, đánh giá, chia sẻ kinh nghiệm trồng và chăm sóc hoa dưới mỗi bài viết.
+\end{itemize}

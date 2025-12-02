@@ -1,0 +1,40 @@
+# Tệp Log và Tệp Phụ Trợ
+*.aux
+*.log
+*.blg
+*.bbl
+*.toc
+*.lot
+*.lof
+*.out
+*.nav
+*.snm
+*.vrb
+*.dvi
+*.ps
+*.idx
+*.ilg
+*.ind
+*.synctex.gz*
+*.fdb_latexmk
+*.fls
+*.xwm
+*.cb
+*.bak
+*.tmp
+*.gz
+
+# Tệp PDF đã biên dịch (Tùy chọn)
+# Bạn nên **giữ** tệp nguồn .tex và **bỏ qua** tệp PDF đã tạo.
+# Nếu bạn muốn đưa tệp PDF vào, hãy bỏ dấu # ở dòng dưới.
+*.pdf
+
+# Tệp Cache/Dữ liệu Tạm thời của các trình soạn thảo (ví dụ: VS Code, TeXShop)
+# Ví dụ cho VS Code (TeX Workshop extension)
+.vscode/
+# TeXShop (macOS)
+.texmacs/
+
+# Thư mục tạm thời của LaTeXmk
+_latex
+_minted-
