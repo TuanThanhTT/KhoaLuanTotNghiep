@@ -1,16 +1,194 @@
+% % =============================================================================
+% % main.tex – PHIÊN BẢN CHUẨN CUỐI CÙNG (ĐÃ SỬA TẤT CẢ LỖI BẠN GẶP)
+% % Biên dịch bằng: XeLaTeX → Biber → XeLaTeX → XeLaTeX
+% % =============================================================================
+% \documentclass[12pt,a4paper,oneside,openany]{book}
+% \usepackage{csquotes}
+% % ==================== FONT & TIẾNG VIỆT ====================
+% \usepackage{fontspec}
+% \setmainfont{Times New Roman}           % Font chuẩn trường
+
+% \usepackage[vietnamese]{babel}          % Hỗ trợ tiếng Việt mới nhất (thay cho vietnam.sty)
+
+% % ==================== LỀ & DÒNG ====================
+% \usepackage{geometry}
+% \geometry{
+%   a4paper,
+%   top=3cm,
+%   bottom=2.5cm,
+%   left=3cm,
+%   right=2cm,
+%   % heightrounded,                       % tránh warning "height rounded"
+% }
+
+% \usepackage{setspace}
+% \onehalfspacing                         % chuẩn 1.5 lines (tương đương setstretch{1.32} nhưng đẹp hơn)
+% \setlength{\parindent}{1.25cm}          % thụt đầu dòng đúng quy định
+
+% % ==================== HEADER / FOOTER ====================
+% \usepackage{fancyhdr}
+% \pagestyle{fancy}
+% \fancyhf{}
+% \fancyhead[C]{\thepage}
+% \renewcommand{\headrulewidth}{0pt}
+% \setlength{\headheight}{15pt}
+% % Đảm bảo số trang luôn ở giữa phía trên cho mọi phần
+
+% \fancypagestyle{plain}{%  % plain cho các trang chapter
+%   \fancyhf{}
+%   \fancyhead[C]{\thepage}
+%   \renewcommand{\headrulewidth}{0pt}
+% }
+
+% % Định nghĩa kiểu đánh số cho phụ lục
+% \newcommand{\appendixpagenumber}{%
+%   \renewcommand{\thepage}{PL\arabic{page}}%
+% }
+
+% % ==================== CHƯƠNG & TIÊU ĐỀ ====================
+% \usepackage{titlesec}
+% \titleformat{\chapter}[display]
+%   {\centering\normalfont\fontsize{14}{18}\selectfont\bfseries}
+%   {CHƯƠNG \thechapter}{10pt}{\LARGE\bfseries}
+% \titlespacing*{\chapter}{0pt}{30pt}{20pt}
+
+% % Chương đặc biệt (MỞ ĐẦU, KẾT LUẬN, TÀI LIỆU THAM KHẢO...) không có số
+% \newcommand{\specialchapter}[1]{%
+%   \cleardoublepage
+%   \thispagestyle{empty}
+%   \vspace*{5cm}
+%   {\centering\fontsize{16}{20}\selectfont\bfseries #1\par}
+%   \vspace{6cm}
+%   \addcontentsline{toc}{chapter}{#1}%
+%   \cleardoublepage
+%   \pagestyle{fancy}
+% }
+
+% % ==================== TOÁN HỌC & BẢNG BIỂU ====================
+% \usepackage{amsmath,amssymb,amsthm}
+% \numberwithin{equation}{chapter}
+% \numberwithin{table}{chapter}
+% \numberwithin{figure}{chapter}
+
+% \usepackage{booktabs,tabularx,caption,float}
+% \captionsetup[table]{
+%   labelfont=bf,
+%   labelsep=quad,
+%   name=Bảng,
+%   justification=centering
+% }
+% \captionsetup[figure]{
+%   labelfont=bf,
+%   labelsep=quad,
+%   name=Ảnh,
+%   position=bottom
+% }
+
+% % ==================== KHUNG BÌA (TCOLORBOX) ====================
+% \usepackage{tcolorbox}
+% \tcbuselibrary{skins}
+
+% % ==================== HYPERREF (LUÔN ĐẶT CUỐI Preamble) ====================
+% \usepackage[unicode,hidelinks]{hyperref}
+% \usepackage[capitalize]{cleveref}   % để \cref{} đẹp hơn
+
+% % ==================== BIBLIOGRAPHY ====================
+% % Sử dụng BibTeX truyền thống, không dùng biblatex
+% % \usepackage[backend=bibtex,
+% %             style=ieee,
+% %             sorting=nyt,
+% %             isbn=false,
+% %             url=true,
+% %             doi=false,
+% %             eprint=false]{biblatex}
+% % \addbibresource{bib/refs.bib}
+
+% % ==================== CSQUOTES (cho biblatex, nếu cần) ====================
+% \usepackage{csquotes}
+
+% \renewcommand{\listtablename}{Danh mục bảng}
+% \renewcommand{\listfigurename}{Danh mục ảnh}
+
+% % =============================================================================
+% \begin{document}
+
+% % ==================== TRANG BÌA CHÍNH ====================
+% \include{frontmatter/cover}
+% \include{frontmatter/subcover}
+
+% % ==================== FRONTMATTER (số La Mã) ====================
+% \frontmatter
+% % Đặt lại số trang về i ngay trước mục lục
+% \setcounter{page}{1}
+% \pagenumbering{roman}
+
+% \include{frontmatter/declaration}      % Cam kết
+% \include{frontmatter/acknowledgement}  % Lời cảm ơn
+% \cleardoublepage
+% \setcounter{page}{1} % Đặt lại số trang về i tại đây
+% \tableofcontents
+% \cleardoublepage
+% \renewcommand{\listtablename}{Danh mục bảng}
+% \listoftables
+% \cleardoublepage
+% \renewcommand{\listfigurename}{Danh mục ảnh}
+% \listoffigures
+
+% % ==================== MAIN MATTER ====================
+% \cleardoublepage
+% \mainmatter
+% \pagenumbering{arabic}
+
+% % Chương mở đầu
+% \include{chapters/introduction}
+
+% % Chương 1
+% \include{chapters/chapter1}
+
+% % Chương 2
+
+% \include{chapters/chapter2}
+
+% % Chương 3
+% \include{chapters/chapter3}
+
+% % Chương 4
+% \include{chapters/chapter4}
+
+% % Kết luận
+% \include{chapters/conclusion}
+
+% % Tài liệu tham khảo
+% \bibliographystyle{ieeetr}
+% \bibliography{bib/refs}
+
+% % ==================== PHỤ LỤC ====================
+% \appendix
+% \cleardoublepage
+% \appendixpagenumber
+% \include{appendices/appendixA}
+% \include{appendices/appendixB}
+
+% \end{document}
+
+
+
+% số trang phía dưới
+
+
 % =============================================================================
-% main.tex – PHIÊN BẢN CHUẨN CUỐI CÙNG (ĐÃ SỬA TẤT CẢ LỖI BẠN GẶP)
-% Biên dịch bằng: XeLaTeX → Biber → XeLaTeX → XeLaTeX
+% main.tex – PHIÊN BẢN HOÀN CHỈNH CUỐI CÙNG (đúng chuẩn ĐH Việt Nam 2025)
+% Số trang: MỤC LỤC = i, luôn ở giữa phía dưới
+% Biên dịch: XeLaTeX → Biber → XeLaTeX → XeLaTeX
 % =============================================================================
 \documentclass[12pt,a4paper,oneside,openany]{book}
-\usepackage{csquotes}
+
 % ==================== FONT & TIẾNG VIỆT ====================
 \usepackage{fontspec}
-\setmainfont{Times New Roman}           % Font chuẩn trường
+\setmainfont{Times New Roman}
+\usepackage[vietnamese]{babel}
 
-\usepackage[vietnamese]{babel}          % Hỗ trợ tiếng Việt mới nhất (thay cho vietnam.sty)
-
-% ==================== LỀ & DÒNG ====================
+% ==================== LỀ TRANG & DÒNG ====================
 \usepackage{geometry}
 \geometry{
   a4paper,
@@ -18,40 +196,35 @@
   bottom=2.5cm,
   left=3cm,
   right=2cm,
-  % heightrounded,                       % tránh warning "height rounded"
 }
 
 \usepackage{setspace}
-\onehalfspacing                         % chuẩn 1.5 lines (tương đương setstretch{1.32} nhưng đẹp hơn)
-\setlength{\parindent}{1.25cm}          % thụt đầu dòng đúng quy định
+\onehalfspacing
+\setlength{\parindent}{1.25cm}
 
-% ==================== HEADER / FOOTER ====================
+% ==================== SỐ TRANG LUÔN Ở DƯỚI GIỮA ====================
 \usepackage{fancyhdr}
 \pagestyle{fancy}
-\fancyhf{}
-\fancyhead[C]{\thepage}
+\fancyhf{}                        % xóa hết header/footer cũ
+\fancyfoot[C]{\thepage}           % số trang ở giữa chân trang
 \renewcommand{\headrulewidth}{0pt}
 \setlength{\headheight}{15pt}
-% Đảm bảo số trang luôn ở giữa phía trên cho mọi phần
-\fancypagestyle{plain}{%  % plain cho các trang chapter
+
+% Trang mở đầu chương (plain) cũng phải ở dưới
+\fancypagestyle{plain}{
   \fancyhf{}
-  \fancyhead[C]{\thepage}
+  \fancyfoot[C]{\thepage}
   \renewcommand{\headrulewidth}{0pt}
 }
 
-% Định nghĩa kiểu đánh số cho phụ lục
-\newcommand{\appendixpagenumber}{%
-  \renewcommand{\thepage}{PL\arabic{page}}%
-}
-
-% ==================== CHƯƠNG & TIÊU ĐỀ ====================
+% ==================== ĐỊNH DẠNG CHƯƠNG ====================
 \usepackage{titlesec}
 \titleformat{\chapter}[display]
   {\centering\normalfont\fontsize{14}{18}\selectfont\bfseries}
   {CHƯƠNG \thechapter}{10pt}{\LARGE\bfseries}
 \titlespacing*{\chapter}{0pt}{30pt}{20pt}
 
-% Chương đặc biệt (MỞ ĐẦU, KẾT LUẬN, TÀI LIỆU THAM KHẢO...) không có số
+% Chương đặc biệt không số (MỞ ĐẦU, KẾT LUẬN, TÀI LIỆU THAM KHẢO...)
 \newcommand{\specialchapter}[1]{%
   \cleardoublepage
   \thispagestyle{empty}
@@ -63,109 +236,84 @@
   \pagestyle{fancy}
 }
 
-% ==================== TOÁN HỌC & BẢNG BIỂU ====================
+% ==================== TOÁN HỌC, BẢNG, ẢNH ====================
 \usepackage{amsmath,amssymb,amsthm}
 \numberwithin{equation}{chapter}
 \numberwithin{table}{chapter}
 \numberwithin{figure}{chapter}
 
 \usepackage{booktabs,tabularx,caption,float}
-\captionsetup[table]{
-  labelfont=bf,
-  labelsep=quad,
-  name=Bảng,
-  justification=centering
-}
-\captionsetup[figure]{
-  labelfont=bf,
-  labelsep=quad,
-  name=Ảnh,
-  position=bottom
-}
+\captionsetup[table]{labelfont=bf,labelsep=quad,name=Bảng,justification=centering}
+\captionsetup[figure]{labelfont=bf,labelsep=quad,name=Ảnh,position=bottom}
 
-% ==================== KHUNG BÌA (TCOLORBOX) ====================
+% ==================== KHÁC ====================
 \usepackage{tcolorbox}
 \tcbuselibrary{skins}
 
-% ==================== HYPERREF (LUÔN ĐẶT CUỐI Preamble) ====================
 \usepackage[unicode,hidelinks]{hyperref}
-\usepackage[capitalize]{cleveref}   % để \cref{} đẹp hơn
-
-% ==================== BIBLIOGRAPHY ====================
-% Sử dụng BibTeX truyền thống, không dùng biblatex
-% \usepackage[backend=bibtex,
-%             style=ieee,
-%             sorting=nyt,
-%             isbn=false,
-%             url=true,
-%             doi=false,
-%             eprint=false]{biblatex}
-% \addbibresource{bib/refs.bib}
-
-% ==================== CSQUOTES (cho biblatex, nếu cần) ====================
-\usepackage{csquotes}
+\usepackage[capitalize]{cleveref}
 
 \renewcommand{\listtablename}{Danh mục bảng}
 \renewcommand{\listfigurename}{Danh mục ảnh}
+
+% Đánh số phụ lục PL1, PL2...
+\newcommand{\appendixpagenumber}{%
+  \renewcommand{\thepage}{PL\arabic{page}}%
+}
 
 % =============================================================================
 \begin{document}
 
-% ==================== TRANG BÌA CHÍNH ====================
+% ==================== TRANG BÌA (không số trang) ====================
 \include{frontmatter/cover}
 \include{frontmatter/subcover}
 
-% ==================== FRONTMATTER (số La Mã) ====================
-\frontmatter
-% Đặt lại số trang về i ngay trước mục lục
-\setcounter{page}{1}
-\pagenumbering{roman}
-
-\include{frontmatter/declaration}      % Cam kết
-\include{frontmatter/acknowledgement}  % Lời cảm ơn
+% ==================== CAM KẾT & LỜI CẢM ƠN (không số trang) ====================
+\pagestyle{empty}
+\include{frontmatter/declaration}
 \cleardoublepage
-\setcounter{page}{1} % Đặt lại số trang về i tại đây
+\include{frontmatter/acknowledgement}
+\cleardoublepage
+
+% ==================== BẮT ĐẦU TỪ ĐÂY LÀ TRANG i ====================
+\pagestyle{fancy}           % bật số trang ở dưới
+\pagenumbering{roman}       % số La Mã
+\setcounter{page}{1}        % MỤC LỤC = trang i
+
 \tableofcontents
 \cleardoublepage
-\renewcommand{\listtablename}{Danh mục bảng}
+
 \listoftables
 \cleardoublepage
-\renewcommand{\listfigurename}{Danh mục ảnh}
-\listoffigures
 
-% ==================== MAIN MATTER ====================
+\listoffigures
 \cleardoublepage
+
+% ==================== NỘI DUNG CHÍNH (từ trang 1) ====================
 \mainmatter
 \pagenumbering{arabic}
 
-% Chương mở đầu
 \include{chapters/introduction}
-
-% Chương 1
 \include{chapters/chapter1}
-
-% Chương 2
-
 \include{chapters/chapter2}
-
-% Chương 3
 \include{chapters/chapter3}
-
-% Chương 4
 \include{chapters/chapter4}
-
-% Kết luận
 \include{chapters/conclusion}
 
-% Tài liệu tham khảo
+% ==================== TÀI LIỆU THAM KHẢO ====================
+\cleardoublepage
 \bibliographystyle{ieeetr}
 \bibliography{bib/refs}
 
 % ==================== PHỤ LỤC ====================
 \appendix
 \cleardoublepage
-\appendixpagenumber
+\appendixpagenumber        % đổi thành PL1, PL2...
+\pagestyle{fancy}          % vẫn giữ số trang ở dưới
+\setcounter{page}{1}       % phụ lục bắt đầu từ PL1
+
 \include{appendices/appendixA}
 \include{appendices/appendixB}
+% Thêm phụ lục khác nếu cần
 
 \end{document}
